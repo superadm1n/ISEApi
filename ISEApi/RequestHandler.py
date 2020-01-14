@@ -1,4 +1,5 @@
 from requests import Session as RequestsSession
+from ISEApi import logger
 
 
 class Session(RequestsSession):
@@ -13,14 +14,17 @@ class Session(RequestsSession):
             request.headers['content-type'] = 'application/json'
         if not request.headers.get('accept'):
             request.headers['accept'] = 'application/json'
+        logger.debug(request.headers)
 
     def _prepend_base_url(self, request):
         """Takes the relative URL that was provided and prepends the base URL to it"""
         relative_url = request.url
         request.url = self.base_url + relative_url
+        logger.debug(request.url)
 
     def prepare_request(self, request):
         """Hijack the request before it is sent to the server and update url and header"""
         self._set_content_type(request)
         self._prepend_base_url(request)
+        logger.debug('Request data: {}'.format(request.data))
         return super().prepare_request(request)
