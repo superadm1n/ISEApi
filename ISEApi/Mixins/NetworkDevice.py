@@ -65,6 +65,8 @@ def subsection(view):
 
 
 class NetworkDeviceConfig:
+    """Object to abstract the generation of a JSON string that is used to
+    submit to the API for creating a network device"""
     def __init__(self, name, description, radius_secret, snmp_secret, snmp_polling_interval,
                  tacacs_secret, ip_address, snmp_version='TWO_C'):
 
@@ -91,7 +93,9 @@ class NetworkDeviceConfig:
 
     @subsection
     def _authentication_section(self):
-        return {'authenticationSettings': {'radiusSharedSecret': self.radius_secret}}
+        return {'authenticationSettings':
+                    {'radiusSharedSecret': self.radius_secret}
+                }
 
     @subsection
     def _snmp_settings(self):
@@ -101,24 +105,31 @@ class NetworkDeviceConfig:
                                  'linkTrapQuery': 'true',
                                  'macTrapQuery': 'true',
                                  'originatingPolicyServicesNode': 'Auto'
-                                 }}
+                                 }
+                }
 
     @subsection
     def _tacacs_settings(self):
-        return {'tacacsSettings': {'sharedSecret': self.tacacs_secret,
-                                   'connectModeOptions': 'OFF'}}
+        return {'tacacsSettings':
+                    {'sharedSecret': self.tacacs_secret, 'connectModeOptions': 'OFF'}
+                }
 
     @subsection
     def _ip_settings(self):
-        return {'NetworkDeviceIPList': [{'ipaddress': self.ip_address,
-                                         'mask': 32}]}
+        return {'NetworkDeviceIPList':
+                    [
+                        {'ipaddress': self.ip_address, 'mask': 32}
+                    ]
+                }
 
     @property
     def json_string(self):
         string = {'NetworkDevice':
                       {'id': self.id, 'name': self.name, 'description': self.description,
                        "NetworkDeviceGroupList": ["Location#All Locations",
-                                                  "Device Type#All Device Types#IOS_Devices"]}}
+                                                  "Device Type#All Device Types#IOS_Devices"]
+                       }
+                  }
 
         for method in self._subsection_methods():
             string['NetworkDevice'].update(method(self))
